@@ -22,6 +22,8 @@ export function DashboardShell({
     router = useRouter();
   const [error, setError] = useState("");
   const links = [
+    { href: "/dashboard", label: "Trang chủ", Icon: LayoutDashboard },
+    { href: "/booking", label: "Đặt lịch", Icon: CalendarDays },
     { href: "/dashboard/pets", label: "Hồ sơ thú cưng", Icon: PawPrint },
     {
       href: "/dashboard/bookings",

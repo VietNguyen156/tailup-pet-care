@@ -6,8 +6,8 @@ export function Footer() {
       <div className="container footer-top">
         <div>
           <Link href="/" className="logo">
-            <PawPrint fill="currentColor" />
-            TailUp<span>®</span>
+            <PawPrint />
+            TailUp.
           </Link>
           <p>
             Một nơi nhỏ.

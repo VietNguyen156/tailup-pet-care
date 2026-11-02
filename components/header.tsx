@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ShoppingBag, Menu, X, PawPrint, ArrowUpRight } from "lucide-react";
+import { ShoppingBag, Menu, X, PawPrint } from "lucide-react";
 import { useState } from "react";
 import { useCart } from "./cart-provider";
 import { request } from "@/lib/client";
@@ -14,8 +14,8 @@ export function Header({ user }: { user: User }) {
   const { count } = useCart();
   const links = [
     ["/services", "Dịch vụ"],
-    ["/shop", "Cửa hàng"],
-    ["/journal", "Góc chăm sóc"],
+    ["/#how-it-works", "Cách đặt lịch"],
+    ["/#faq", "Câu hỏi thường gặp"],
   ];
   async function logout() {
     try {
@@ -29,15 +29,11 @@ export function Header({ user }: { user: User }) {
   }
   return (
     <>
-      <div className="announcement">
-        Một chút chăm chút. Một đời thương yêu.{" "}
-        <span>Chào mừng bạn đến với TailUp ♡</span>
-      </div>
       <header className="site-header">
         <div className="container header-inner">
           <Link href="/" className="logo" aria-label="TailUp, trang chủ">
-            <PawPrint fill="currentColor" size={29} />
-            TailUp<span>®</span>
+            <PawPrint size={29} />
+            TailUp.
           </Link>
           <nav className="desktop-nav" aria-label="Điều hướng chính">
             {links.map(([href, label]) => (
@@ -49,7 +45,7 @@ export function Header({ user }: { user: User }) {
                 {label}
               </Link>
             ))}
-            <Link href="/#about">Về TailUp</Link>
+
           </nav>
           <div className="header-actions">
             <Link
@@ -61,7 +57,7 @@ export function Header({ user }: { user: User }) {
               {count > 0 && <span>{count}</span>}
             </Link>
             {user ? (
-              <Link className="account-link" href="/dashboard/pets">
+              <Link className="account-link" href="/dashboard">
                 Chào, {user.name.split(" ").pop()}
               </Link>
             ) : (
@@ -69,8 +65,8 @@ export function Header({ user }: { user: User }) {
                 Đăng nhập
               </Link>
             )}
-            <Link href="/booking" className="button small desktop-book">
-              Đặt lịch <ArrowUpRight size={16} />
+            <Link href={user ? "/booking" : "/register"} className="button outline desktop-book">
+              {user ? "Đặt lịch" : "Đăng ký"}
             </Link>
             <button
               className="icon-button menu-toggle"
@@ -83,7 +79,7 @@ export function Header({ user }: { user: User }) {
           </div>
         </div>
         {open && (
-          <nav className="mobile-nav container">
+          <nav className="mobile-nav container" aria-label="Điều hướng di động">
             {links.map(([href, label]) => (
               <Link key={href} onClick={() => setOpen(false)} href={href}>
                 {label}
@@ -93,11 +89,12 @@ export function Header({ user }: { user: User }) {
               Đặt lịch chăm sóc
             </Link>
             <Link
-              href={user ? "/dashboard/pets" : "/login"}
+              href={user ? "/dashboard" : "/login"}
               onClick={() => setOpen(false)}
             >
               {user ? "Tài khoản của tôi" : "Đăng nhập"}
             </Link>
+            {!user && <Link href="/register" onClick={() => setOpen(false)}>Đăng ký</Link>}
             {user && <button onClick={logout}>Đăng xuất</button>}
           </nav>
         )}

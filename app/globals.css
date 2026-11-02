@@ -1,13 +1,13 @@
 @import "tailwindcss";
 :root {
-  --cream: #faf8f1;
-  --paper: #fffefa;
-  --ink: #253d32;
-  --green: #294e3c;
-  --sage: #e6e9dc;
-  --clay: #b96243;
-  --muted: #73776c;
-  --line: #e2e3d8;
+  --cream: #f7f4f0;
+  --paper: #fffdfb;
+  --ink: #33292d;
+  --green: #39252e;
+  --sage: #eee4e4;
+  --clay: #805d68;
+  --muted: #787173;
+  --line: #e3dcda;
   --radius: 18px;
   --font-sans: Arial, Helvetica, sans-serif;
 }
@@ -87,10 +87,10 @@ h3 {
   font-weight: 600;
 }
 p {
-  color: #6b7166;
+  color: #787173;
 }
 em {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-weight: 400;
   color: var(--clay);
 }
@@ -100,7 +100,7 @@ em {
 }
 ::selection {
   background: #e6c4a7;
-  color: #253d32;
+  color: #33292d;
 }
 .container {
   width: min(1232px, calc(100% - 96px));
@@ -119,7 +119,7 @@ em {
   opacity: 0.73;
 }
 .site-header {
-  background: #faf8f1f5;
+  background: #f7f4f0f5;
   position: sticky;
   top: 0;
   z-index: 30;
@@ -195,7 +195,7 @@ em {
   min-height: 49px;
 }
 .button:hover {
-  background: #193b2b;
+  background: #513540;
   transform: translateY(-1px);
 }
 .button.small {
@@ -206,10 +206,10 @@ em {
 .button.outline {
   background: transparent;
   color: var(--green);
-  border-color: #bcc6b7;
+  border-color: #b8a8ad;
 }
 .button.outline:hover {
-  background: #e9ecdf;
+  background: #f0e6e8;
 }
 .button.light {
   background: #fff9e9;
@@ -235,7 +235,7 @@ em {
   min-height: 38px;
 }
 .icon-button:hover {
-  background: #e9ebdf;
+  background: #eee4e4;
 }
 .cart-link {
   position: relative;
@@ -412,7 +412,7 @@ em {
   position: absolute;
   right: 36px;
   top: 20px;
-  font-family: Georgia, serif;
+  font-family: var(--font-serif);
   font-style: italic;
   font-size: 21px;
   line-height: 1.2;
@@ -478,7 +478,7 @@ em {
 .trust-strip {
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
-  background: #f2f3e9;
+  background: #f0e9e5;
 }
 .trust-strip > .container {
   display: grid;
@@ -527,7 +527,7 @@ em {
 }
 .service-card {
   border: 1px solid var(--line);
-  background: #fffdf7;
+  background: #fffdfb;
   border-radius: 14px;
   padding: 25px 23px;
   display: flex;
@@ -548,11 +548,11 @@ em {
   width: 48px;
   height: 48px;
   border-radius: 13px;
-  background: #edf0e3;
+  background: #f2e8e8;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #607650;
+  color: #805d68;
 }
 .service-icon svg {
   width: 26px;
@@ -571,7 +571,7 @@ em {
   color: #a88d4e;
 }
 .small-number {
-  font-family: Georgia, serif;
+  font-family: var(--font-serif);
   font-size: 14px;
   color: #b8baa9;
 }
@@ -622,8 +622,8 @@ em {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: #eef0e4;
-  border: 1px solid #e1e5d5;
+  background: #f2e8e8;
+  border: 1px solid #e3dcda;
 }
 .round-link svg {
   width: 18px;
@@ -818,7 +818,7 @@ em {
   transform: rotate(-20deg);
 }
 .banner-paw > span {
-  font-family: Georgia, serif;
+  font-family: var(--font-serif);
   font-size: 51px;
   line-height: 1;
 }
@@ -826,8 +826,8 @@ em {
   color: #d9b58c;
 }
 .site-footer {
-  background: #f0f0e6;
-  border-top: 1px solid #e1e3d6;
+  background: #eee7e2;
+  border-top: 1px solid #e3dcda;
   padding: 55px 0 0;
 }
 .footer-top {
@@ -853,7 +853,7 @@ em {
 .footer-top > div > a:not(.logo) {
   display: block;
   font-size: 11px;
-  color: #6c7666;
+  color: #787173;
   margin-bottom: 9px;
 }
 .footer-note {
@@ -866,7 +866,7 @@ em {
   margin-bottom: 11px;
 }
 .footer-note > a {
-  font-family: Georgia, serif;
+  font-family: var(--font-serif);
   font-size: 23px !important;
   line-height: 1.35;
   color: var(--ink) !important;
@@ -921,7 +921,7 @@ em {
   font-size: 44px;
 }
 .soft-panel {
-  background: #edf0e3;
+  background: #f2e8e8;
   border-radius: 14px;
   padding: 28px 32px;
 }
@@ -946,7 +946,7 @@ em {
   align-items: center;
 }
 .service-detail-art {
-  background: #e6e9dc;
+  background: #eee4e4;
   min-height: 510px;
   border-radius: 22px;
   display: flex;
@@ -969,7 +969,7 @@ em {
   color: #839474;
 }
 .service-detail-art > h2 {
-  font-family: Georgia, serif;
+  font-family: var(--font-serif);
   font-size: 29px;
   font-style: italic;
   letter-spacing: -0.5px;
@@ -1140,7 +1140,7 @@ textarea {
   padding: 12px 13px;
   border: 1px solid #dce0d2;
   border-radius: 7px;
-  background: #fffefa;
+  background: #fffdfb;
   color: var(--ink);
   font-size: 13px;
   line-height: 1.6;
@@ -1401,7 +1401,7 @@ label > .password-field {
   align-items: center;
   gap: 15px;
   border: 1px solid #dde2d2;
-  background: #fffefa;
+  background: #fffdfb;
   border-radius: 10px;
   padding: 17px;
   cursor: pointer;
@@ -1661,7 +1661,7 @@ label > .password-field {
   background: #e7ecda;
   color: #6b8355;
   font-size: 23px;
-  font-family: Georgia, serif;
+  font-family: var(--font-serif);
   margin-bottom: 14px;
 }
 .dashboard-sidebar > strong {
@@ -2222,7 +2222,7 @@ label > .password-field {
   flex-wrap: wrap;
 }
 .admin-tabs button {
-  background: #e9ecdf;
+  background: #f0e6e8;
   border-radius: 6px;
   padding: 10px 18px;
   color: var(--ink);

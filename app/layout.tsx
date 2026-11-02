@@ -4,6 +4,8 @@ import { CartProvider } from "@/components/cart-provider";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import "./globals.css";
+import "./refresh.css";
+import "./auth.css";
 export const metadata: Metadata = {
   title: {
     default: "TailUp — Chăm chút cho người bạn nhỏ",
