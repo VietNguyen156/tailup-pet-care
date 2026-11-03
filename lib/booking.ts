@@ -11,7 +11,12 @@ export async function createBooking(userId: string, input: BookingInput) {
     );
   return serializable(async (tx) => {
     const service = await tx.service.findFirst({
-      where: { id: input.serviceId, isActive: true },
+      where: {
+        id: input.serviceId,
+        isActive: true,
+        deletedAt: null,
+        store: { isActive: true },
+      },
     });
     if (!service) throw new ApiError(404, "Dịch vụ không còn hoạt động.");
     // Lock customer to serialize pet creation / overlap checks for their appointments.
@@ -20,7 +25,11 @@ export async function createBooking(userId: string, input: BookingInput) {
     );
     if (input.staffId) {
       const staff = await tx.user.findFirst({
-        where: { id: input.staffId, role: "STAFF" },
+        where: {
+          id: input.staffId,
+          role: "STORE_ADMIN",
+          storeId: service.storeId,
+        },
       });
       if (!staff) throw new ApiError(400, "Nhân viên không hợp lệ.");
       await tx.$queryRaw(
@@ -30,9 +39,17 @@ export async function createBooking(userId: string, input: BookingInput) {
     const bookingDate = new Date(`${input.bookingDate}T00:00:00Z`);
     const slot = await tx.appointmentSlot.upsert({
       where: {
-        bookingDate_timeSlot: { bookingDate, timeSlot: input.timeSlot },
+        storeId_bookingDate_timeSlot: {
+          storeId: service.storeId,
+          bookingDate,
+          timeSlot: input.timeSlot,
+        },
       },
-      create: { bookingDate, timeSlot: input.timeSlot },
+      create: {
+        storeId: service.storeId,
+        bookingDate,
+        timeSlot: input.timeSlot,
+      },
       update: {},
     });
     await tx.$queryRaw(
@@ -86,6 +103,7 @@ export async function createBooking(userId: string, input: BookingInput) {
       data: {
         userId,
         petId,
+        storeId: service.storeId,
         serviceId: service.id,
         staffId: input.staffId || null,
         slotId: slot.id,
@@ -108,11 +126,23 @@ export async function availability(
 ) {
   const bookingDate = new Date(`${date}T00:00:00Z`);
   const service = await tx.service.findFirst({
-    where: { id: serviceId, isActive: true },
+    where: {
+      id: serviceId,
+      isActive: true,
+      deletedAt: null,
+      store: { isActive: true },
+    },
   });
   if (!service) throw new ApiError(404, "Dịch vụ không tồn tại.");
+  if (
+    staffId &&
+    !(await tx.user.findFirst({
+      where: { id: staffId, role: "STORE_ADMIN", storeId: service.storeId },
+    }))
+  )
+    throw new ApiError(400, "Nhân viên không thuộc cửa hàng này.");
   const slots = await tx.appointmentSlot.findMany({
-    where: { bookingDate },
+    where: { bookingDate, storeId: service.storeId },
     include: {
       _count: {
         select: {

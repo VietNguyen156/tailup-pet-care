@@ -6,6 +6,9 @@ import { Footer } from "@/components/footer";
 import "./globals.css";
 import "./refresh.css";
 import "./auth.css";
+import "./stores.css";
+import "./store-website.css";
+import { PlatformFooter } from "@/components/platform-footer";
 export const metadata: Metadata = {
   title: {
     default: "TailUp — Chăm chút cho người bạn nhỏ",
@@ -32,7 +35,9 @@ export default async function RootLayout({
             </div>
           )}
           <main id="main">{children}</main>
-          <Footer />
+          <PlatformFooter>
+            <Footer />
+          </PlatformFooter>
         </CartProvider>
       </body>
     </html>

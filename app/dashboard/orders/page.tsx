@@ -9,7 +9,7 @@ export default async function Page() {
   const user = await requirePageUser();
   const orders = await db.order.findMany({
     where: { userId: user.id },
-    include: { items: true },
+    include: { items: true, store: { select: { name: true, slug: true } } },
     orderBy: { createdAt: "desc" },
     take: 100,
   });
@@ -30,6 +30,12 @@ export default async function Page() {
       {orders.length ? (
         orders.map((o) => (
           <article className="list-card" key={o.id}>
+            <Link
+              className="tenant-product-store"
+              href={`/stores/${o.store.slug}`}
+            >
+              {o.store.name}
+            </Link>
             <div className="list-card-head">
               <div>
                 <h3>Đơn hàng #{o.id.slice(-8).toUpperCase()}</h3>

@@ -1,0 +1,10 @@
+ALTER TABLE `Store` ADD COLUMN `website` JSON NULL;
+CREATE TABLE `StoreBanner` (
+ `storeId` VARCHAR(191) NOT NULL,
+ `slot` INTEGER NOT NULL,
+ `contentType` VARCHAR(30) NOT NULL,
+ `data` MEDIUMBLOB NOT NULL,
+ `updatedAt` DATETIME(3) NOT NULL,
+ PRIMARY KEY (`storeId`, `slot`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE `StoreBanner` ADD CONSTRAINT `StoreBanner_storeId_fkey` FOREIGN KEY (`storeId`) REFERENCES `Store`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

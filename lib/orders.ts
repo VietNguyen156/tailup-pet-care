@@ -17,14 +17,26 @@ export async function createOrder(
   return serializable(async (tx) => {
     let total = new Prisma.Decimal(0);
     const items = [];
+    let storeId: string | undefined;
     for (const [productId, quantity] of [...merged].sort(([a], [b]) =>
       a.localeCompare(b),
     )) {
       const product = await tx.product.findFirst({
-        where: { id: productId, isActive: true },
+        where: {
+          id: productId,
+          isActive: true,
+          deletedAt: null,
+          store: { isActive: true },
+        },
       });
       if (!product)
         throw new ApiError(400, "Một sản phẩm không còn kinh doanh.");
+      if (storeId && storeId !== product.storeId)
+        throw new ApiError(
+          400,
+          "Mỗi đơn hàng chỉ gồm sản phẩm của một cửa hàng. Vui lòng đặt riêng từng cửa hàng.",
+        );
+      storeId = product.storeId;
       const result = await tx.product.updateMany({
         where: { id: productId, stock: { gte: quantity } },
         data: { stock: { decrement: quantity } },
@@ -39,9 +51,11 @@ export async function createOrder(
         productName: product.name,
       });
     }
+    if (!storeId) throw new ApiError(400, "Giỏ hàng đang trống.");
     return tx.order.create({
       data: {
         userId,
+        storeId,
         recipientName: input.recipientName,
         phone: input.phone,
         address: input.address,

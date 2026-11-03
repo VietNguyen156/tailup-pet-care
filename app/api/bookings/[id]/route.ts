@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { canManageStore } from "@/lib/permissions";
 import { requireUser } from "@/lib/auth";
 import { checkOrigin, errorResponse, ApiError, jsonBody } from "@/lib/http";
 import { z } from "zod";
@@ -18,7 +19,15 @@ export async function PATCH(
     const booking = await serializable(async (tx) => {
       const existing = await tx.booking.findUnique({ where: { id } });
       if (!existing) throw new ApiError(404, "Không tìm thấy lịch hẹn.");
-      const staff = user.role === "ADMIN" || user.role === "STAFF";
+      const staff = canManageStore(user, existing.storeId);
+      if (staff && user.role !== "SUPER_ADMIN") {
+        const store = await tx.store.findUnique({
+          where: { id: existing.storeId },
+          select: { isActive: true },
+        });
+        if (!store?.isActive)
+          throw new ApiError(403, "Cửa hàng đang tạm ngưng.");
+      }
       if (!staff && existing.userId !== user.id)
         throw new ApiError(403, "Bạn không có quyền sửa lịch hẹn.");
       if (!staff && input.status !== "CANCELLED")

@@ -32,9 +32,15 @@ export default async function Page({
       </Link>
       <div className="detail-grid">
         <div className={`product-detail-art ${product.color}`}>
-          <ProductArt id={product.id} />
+          <ProductArt id={product.id} src={product.imageUrl} />
         </div>
         <div>
+          <Link
+            className="tenant-product-store"
+            href={`/stores/${product.store.slug}`}
+          >
+            {product.store.name}
+          </Link>
           <span className="eyebrow">{product.category}</span>
           <h1 className="detail-title">{product.name}</h1>
           <div className="detail-price">{money(product.price)}</div>

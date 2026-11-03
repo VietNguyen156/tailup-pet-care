@@ -23,13 +23,24 @@ async function main() {
     productId = `${prefix}-product`,
     otherProductId = `${prefix}-other`;
   try {
+    await db.store.create({
+      data: {
+        id: prefix,
+        name: prefix,
+        slug: prefix,
+        description: "Test",
+        address: "Test address",
+        phone: "0901234567",
+      },
+    });
     const staff = await db.user.create({
       data: {
         id: `${prefix}-staff`,
         name: "Test Staff",
         email: `${prefix}-staff@example.invalid`,
         passwordHash: "unused",
-        role: "STAFF",
+        role: "STORE_ADMIN",
+        storeId: prefix,
       },
     });
     userIds.push(staff.id);
@@ -56,6 +67,7 @@ async function main() {
     await db.service.create({
       data: {
         id: serviceId,
+        storeId: prefix,
         name: "Integration service",
         slug: serviceId,
         description: "temporary",
@@ -68,7 +80,11 @@ async function main() {
     // Reserve empty, isolated slot rows first; never reuse another run's date/slot.
     for (const timeSlot of ["09:00", "10:30", "14:00"]) {
       const slot = await db.appointmentSlot.create({
-        data: { bookingDate: new Date(`${date}T00:00:00Z`), timeSlot },
+        data: {
+          storeId: prefix,
+          bookingDate: new Date(`${date}T00:00:00Z`),
+          timeSlot,
+        },
       });
       slotIds.push(slot.id);
     }
@@ -121,6 +137,7 @@ async function main() {
     await db.product.create({
       data: {
         id: productId,
+        storeId: prefix,
         name: "Test product",
         slug: productId,
         category: "Test",
@@ -132,6 +149,7 @@ async function main() {
     await db.product.create({
       data: {
         id: otherProductId,
+        storeId: prefix,
         name: "Rollback product",
         slug: otherProductId,
         category: "Test",
@@ -188,6 +206,7 @@ async function main() {
       where: { id: { in: [productId, otherProductId] } },
     });
     await db.user.deleteMany({ where: { id: { in: userIds } } });
+    await db.store.deleteMany({ where: { id: prefix } });
     await db.$disconnect();
   }
 }

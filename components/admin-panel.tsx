@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { request } from "@/lib/client";
+import { CatalogEditor, type CatalogItem } from "./catalog-editor";
+
 import { bookingLabels, orderLabels, money, dateLabel } from "@/lib/utils";
 import { StatusAction } from "./status-action";
 type Booking = {
@@ -24,20 +24,8 @@ type Order = {
   address: string;
   items: { productName: string; quantity: number }[];
 };
-type Product = {
-  id: string;
-  name: string;
-  price: string;
-  stock: number;
-  isActive: boolean;
-};
-type Service = {
-  id: string;
-  name: string;
-  price: string;
-  durationMinutes: number;
-  isActive: boolean;
-};
+type Product = CatalogItem;
+type Service = CatalogItem;
 export function AdminPanel({
   bookings,
   orders,
@@ -49,30 +37,9 @@ export function AdminPanel({
   products: Product[];
   services: Service[];
 }) {
-  const [tab, setTab] = useState("bookings"),
-    [error, setError] = useState(""),
-    [message, setMessage] = useState(""),
-    [busy, setBusy] = useState("");
-  const router = useRouter();
-  async function save(url: string, id: string, data: object) {
-    setBusy(id);
-    setError("");
-    setMessage("");
-    try {
-      await request(url, {
-        method: "PATCH",
-        body: JSON.stringify({ id, ...data }),
-      });
-      setMessage("Đã lưu thay đổi.");
-      router.refresh();
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
-      setBusy("");
-    }
-  }
+  const [tab, setTab] = useState("bookings");
   return (
-    <>
+    <section id="catalog-management" style={{ scrollMarginTop: 24 }}>
       <div className="admin-tabs">
         {[
           ["bookings", "Lịch hẹn"],
@@ -82,27 +49,17 @@ export function AdminPanel({
         ].map(([value, label]) => (
           <button
             key={value}
+            type="button"
+            aria-pressed={tab === value}
             className={tab === value ? "selected" : ""}
             onClick={() => {
               setTab(value);
-              setError("");
-              setMessage("");
             }}
           >
             {label}
           </button>
         ))}
       </div>
-      {error && (
-        <p className="error" role="alert">
-          {error}
-        </p>
-      )}
-      {message && (
-        <p className="success-message" role="status">
-          {message}
-        </p>
-      )}
       <div className="table-wrap">
         {tab === "bookings" && (
           <table>
@@ -245,134 +202,10 @@ export function AdminPanel({
           </table>
         )}
         {tab === "products" && (
-          <table>
-            <thead>
-              <tr>
-                <th>Sản phẩm</th>
-                <th>Giá (VND)</th>
-                <th>Tồn kho</th>
-                <th>Đang bán</th>
-                <th>Lưu</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map((p) => (
-                <tr key={p.id}>
-                  <td>{p.name}</td>
-                  <td>
-                    <input
-                      form={`product-${p.id}`}
-                      aria-label={`Giá ${p.name}`}
-                      name="price"
-                      type="number"
-                      required
-                      min="1000"
-                      max="999999999"
-                      defaultValue={p.price}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      form={`product-${p.id}`}
-                      aria-label={`Tồn kho ${p.name}`}
-                      name="stock"
-                      type="number"
-                      required
-                      min="0"
-                      max="100000"
-                      defaultValue={p.stock}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      form={`product-${p.id}`}
-                      aria-label={`Đang bán ${p.name}`}
-                      type="checkbox"
-                      name="isActive"
-                      defaultChecked={p.isActive}
-                    />
-                  </td>
-                  <td>
-                    <form
-                      id={`product-${p.id}`}
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        const data = new FormData(e.currentTarget);
-                        void save("/api/admin/products", p.id, {
-                          price: Number(data.get("price")),
-                          stock: Number(data.get("stock")),
-                          isActive: data.has("isActive"),
-                        });
-                      }}
-                    >
-                      <button className="button" disabled={busy === p.id}>
-                        {busy === p.id ? "Đang lưu…" : "Lưu"}
-                      </button>
-                    </form>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <CatalogEditor kind="products" items={products} />
         )}
         {tab === "services" && (
-          <table>
-            <thead>
-              <tr>
-                <th>Dịch vụ</th>
-                <th>Thời lượng</th>
-                <th>Giá (VND)</th>
-                <th>Hoạt động</th>
-                <th>Lưu</th>
-              </tr>
-            </thead>
-            <tbody>
-              {services.map((s) => (
-                <tr key={s.id}>
-                  <td>{s.name}</td>
-                  <td>{s.durationMinutes} phút</td>
-                  <td>
-                    <input
-                      form={`service-${s.id}`}
-                      aria-label={`Giá ${s.name}`}
-                      name="price"
-                      type="number"
-                      required
-                      min="1000"
-                      max="999999999"
-                      defaultValue={s.price}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      form={`service-${s.id}`}
-                      aria-label={`Hoạt động ${s.name}`}
-                      name="isActive"
-                      type="checkbox"
-                      defaultChecked={s.isActive}
-                    />
-                  </td>
-                  <td>
-                    <form
-                      id={`service-${s.id}`}
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        const data = new FormData(e.currentTarget);
-                        void save("/api/admin/services", s.id, {
-                          price: Number(data.get("price")),
-                          isActive: data.has("isActive"),
-                        });
-                      }}
-                    >
-                      <button className="button" disabled={busy === s.id}>
-                        {busy === s.id ? "Đang lưu…" : "Lưu"}
-                      </button>
-                    </form>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <CatalogEditor kind="services" items={services} />
         )}
         {((tab === "bookings" && !bookings.length) ||
           (tab === "orders" && !orders.length)) && (
@@ -385,6 +218,6 @@ export function AdminPanel({
         Hiển thị 100 lịch hẹn và 100 đơn hàng gần nhất. Hoàn tất đơn COD đồng
         nghĩa xác nhận đã thu tiền.
       </p>
-    </>
+    </section>
   );
 }

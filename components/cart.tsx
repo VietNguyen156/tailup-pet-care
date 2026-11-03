@@ -14,14 +14,31 @@ export function Cart({
   products: ProductView[];
   user: { name: string; phone: string | null } | null;
 }) {
-  const { items, ready, update, clear } = useCart();
+  const { items, ready, update } = useCart();
   const [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
     [orderId, setOrderId] = useState("");
-  const rows = items.map((i) => ({
+  const [selectedStore, setSelectedStore] = useState("");
+  const allRows = items.map((i) => ({
     item: i,
     product: products.find((p) => p.id === i.productId),
   }));
+  const stores = [
+    ...new Map(
+      allRows
+        .filter((r) => r.product)
+        .map((r) => [
+          r.product!.storeId ?? "store-tailup",
+          r.product!.store?.name ?? "TailUp",
+        ]),
+    ).entries(),
+  ];
+  const storeId = stores.some(([id]) => id === selectedStore)
+    ? selectedStore
+    : stores[0]?.[0];
+  const rows = allRows.filter(
+    (r) => !r.product || (r.product.storeId ?? "store-tailup") === storeId,
+  );
   const total = rows.reduce(
     (sum, r) => sum + (r.product?.price ?? 0) * r.item.quantity,
     0,
@@ -47,6 +64,11 @@ export function Cart({
           Đơn hàng <strong>#{orderId.slice(-8).toUpperCase()}</strong> đang chờ
           xử lý. Bạn thanh toán khi nhận hàng.
         </p>
+        {items.length > 0 && (
+          <button className="button outline" onClick={() => setOrderId("")}>
+            Tiếp tục đặt tại cửa hàng khác
+          </button>
+        )}
         <Link href="/dashboard/orders" className="button">
           Theo dõi đơn hàng <ArrowRight size={17} />
         </Link>
@@ -66,6 +88,27 @@ export function Cart({
   return (
     <div className="cart-layout">
       <div className="cart-items">
+        <label className="tenant-cart-selector">
+          Đặt hàng theo cửa hàng
+          <select
+            value={storeId ?? ""}
+            onChange={(e) => {
+              setSelectedStore(e.target.value);
+              setError("");
+            }}
+            disabled={busy}
+          >
+            {stores.map(([id, name]) => (
+              <option key={id} value={id}>
+                {name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <p className="muted">
+          Mỗi cửa hàng nhận một đơn riêng. Sản phẩm ở cửa hàng khác vẫn được giữ
+          trong giỏ.
+        </p>
         {rows.map(({ item, product }) => (
           <article className="cart-item" key={item.productId}>
             {product && (
@@ -73,7 +116,7 @@ export function Cart({
                 href={`/shop/${product.slug}`}
                 className={`cart-item-art ${product.color}`}
               >
-                <ProductArt id={product.id} />
+                <ProductArt id={product.id} src={product.imageUrl} />
               </Link>
             )}
             <div className="cart-item-info">
@@ -150,7 +193,7 @@ export function Cart({
                   body: JSON.stringify({
                     ...form,
                     paymentMethod: "COD",
-                    items: items.map((i) => ({
+                    items: rows.map(({ item: i }) => ({
                       productId: i.productId,
                       quantity: i.quantity,
                     })),
@@ -158,7 +201,7 @@ export function Cart({
                 },
               );
               setOrderId(result.order.id);
-              clear();
+              for (const row of rows) update(row.item.productId, 0);
             } catch (e) {
               setError((e as Error).message);
             } finally {

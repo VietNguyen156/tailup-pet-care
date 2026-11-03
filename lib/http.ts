@@ -62,9 +62,9 @@ export function checkOrigin(request: Request) {
   if (!origin || origin !== expected)
     throw new ApiError(403, "Nguồn yêu cầu không hợp lệ. Kiểm tra APP_URL.");
 }
-export async function jsonBody(request: Request) {
+export async function jsonBody(request: Request, maxBytes = 32768) {
   const body = await request.text();
-  if (Buffer.byteLength(body) > 32768)
+  if (Buffer.byteLength(body) > maxBytes)
     throw new ApiError(413, "Dữ liệu gửi lên quá lớn.");
   return JSON.parse(body);
 }

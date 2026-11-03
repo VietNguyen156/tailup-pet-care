@@ -15,20 +15,42 @@ export default async function Page({
   if (!service) notFound();
   return (
     <div className="container page-space">
-      <Link className="back-link" href="/services">
+      <Link
+        className="back-link"
+        href={`/stores/${service.store.slug}/services`}
+      >
         ← Tất cả dịch vụ
       </Link>
       <div className="detail-grid">
-        <div className="service-detail-art">
-          <ServiceIcon name={service.icon} />
-          <span>TAILUP CARE CLUB</span>
-          <h2>
-            Một chút chăm chút.
-            <br />
-            Thật nhiều yêu thương.
-          </h2>
-        </div>
+        {service.imageUrl ? (
+          <img
+            src={service.imageUrl}
+            alt={service.name}
+            style={{
+              width: "100%",
+              maxHeight: 600,
+              objectFit: "contain",
+              borderRadius: 12,
+            }}
+          />
+        ) : (
+          <div className="service-detail-art">
+            <ServiceIcon name={service.icon} />
+            <span>TAILUP CARE CLUB</span>
+            <h2>
+              Một chút chăm chút.
+              <br />
+              Thật nhiều yêu thương.
+            </h2>
+          </div>
+        )}
         <div>
+          <Link
+            className="tenant-product-store"
+            href={`/stores/${service.store.slug}`}
+          >
+            {service.store.name}
+          </Link>
           <span className="eyebrow">{service.category}</span>
           <h1 className="detail-title">{service.name}</h1>
           <p className="lead">{service.description}</p>

@@ -1,14 +1,37 @@
+import { getStoreGallery } from "@/lib/gallery";
+import { GalleryManager } from "@/components/gallery-manager";
+import { BannerManager } from "@/components/banner-manager";
+import { WebsiteEditor } from "@/components/website-editor";
+import { readWebsite } from "@/lib/store-website";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { requirePageUser } from "@/lib/auth";
+import { managementPage } from "@/lib/stores";
+import { StoreSettings, CatalogCreate } from "@/components/store-settings";
 import { db } from "@/lib/db";
 import { AdminPanel } from "@/components/admin-panel";
 import { money } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Quản trị TailUp" };
-export default async function Page() {
-  const user = await requirePageUser();
-  if (user.role === "CUSTOMER") redirect("/dashboard/pets");
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ store?: string }>;
+}) {
+  const { user, store } = await managementPage((await searchParams).store);
+  if (!store.isActive && user.role !== "SUPER_ADMIN")
+    return (
+      <div className="container page-space">
+        <h1>Cửa hàng đang tạm ngưng</h1>
+        <p>
+          Liên hệ quản trị TailUp để mở lại cửa hàng. Dữ liệu của bạn vẫn được
+          giữ nguyên.
+        </p>
+        <Link className="button" href="/dashboard/profile">
+          Tài khoản của tôi
+        </Link>
+      </div>
+    );
+  const storeId = store.id;
+  const gallery = await getStoreGallery(storeId, store.slug);
   const [
     bookings,
     orders,
@@ -18,8 +41,11 @@ export default async function Page() {
     pendingOrders,
     revenue,
     customerCount,
+    customers,
+    serviceRevenue,
   ] = await Promise.all([
     db.booking.findMany({
+      where: { storeId },
       include: {
         user: { select: { name: true, phone: true } },
         pet: { select: { name: true } },
@@ -30,27 +56,58 @@ export default async function Page() {
       take: 100,
     }),
     db.order.findMany({
+      where: { storeId },
       include: { items: true },
       orderBy: { createdAt: "desc" },
       take: 100,
     }),
-    db.product.findMany({ orderBy: { name: "asc" } }),
-    db.service.findMany({ orderBy: { name: "asc" } }),
-    db.booking.count({ where: { status: "PENDING" } }),
-    db.order.count({ where: { status: "PENDING" } }),
+    db.product.findMany({
+      where: { storeId, deletedAt: null },
+      include: { images: { orderBy: { sortOrder: "asc" } } },
+      orderBy: { name: "asc" },
+    }),
+    db.service.findMany({
+      where: { storeId, deletedAt: null },
+      include: { image: { select: { serviceId: true } } },
+      orderBy: { name: "asc" },
+    }),
+    db.booking.count({ where: { storeId, status: "PENDING" } }),
+    db.order.count({ where: { storeId, status: "PENDING" } }),
     db.order.aggregate({
-      where: { status: "COMPLETED", paymentStatus: "PAID" },
+      where: { storeId, status: "COMPLETED", paymentStatus: "PAID" },
       _sum: { totalAmount: true },
     }),
-    db.user.count({ where: { role: "CUSTOMER" } }),
+    db.user.count({
+      where: {
+        OR: [
+          { bookings: { some: { storeId } } },
+          { orders: { some: { storeId } } },
+        ],
+      },
+    }),
+    db.user.findMany({
+      where: {
+        OR: [
+          { bookings: { some: { storeId } } },
+          { orders: { some: { storeId } } },
+        ],
+      },
+      select: { id: true, name: true, email: true, phone: true },
+      orderBy: { name: "asc" },
+      take: 100,
+    }),
+    db.booking.aggregate({
+      where: { storeId, status: "COMPLETED" },
+      _sum: { price: true },
+    }),
   ]);
   return (
     <div className="container admin-layout">
       <div className="admin-top">
         <div>
           <span className="eyebrow">TAILUP / KHÔNG GIAN QUẢN TRỊ</span>
-          <h1>Chào {user.name}.</h1>
-          <p>Một góc nhìn cho những việc cần chăm chút hôm nay.</p>
+          <h1>{store.name}</h1>
+          <p>Chào {user.name}. Số liệu và giao dịch của cửa hàng này.</p>
         </div>
         <Link className="button outline" href="/dashboard/pets">
           Tài khoản của tôi
@@ -72,9 +129,89 @@ export default async function Page() {
           </strong>
         </div>
         <div className="stat-card">
-          <span>Khách hàng</span>
+          <span>Khách đã giao dịch</span>
           <strong>{customerCount}</strong>
         </div>
+      </div>
+      <p className="muted">
+        Giá trị dịch vụ đã hoàn thành:{" "}
+        <strong>{money(serviceRevenue._sum.price ?? 0)}</strong>. Chỉ số này
+        không đồng nghĩa dịch vụ đã thu tiền. Số liệu toàn thời gian của cửa
+        hàng.
+      </p>
+      <details className="panel tenant-settings">
+        <summary>Khách hàng đã giao dịch ({customerCount})</summary>
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Họ tên</th>
+                <th>Email</th>
+                <th>Điện thoại</th>
+              </tr>
+            </thead>
+            <tbody>
+              {customers.map((c) => (
+                <tr key={c.id}>
+                  <td>{c.name}</td>
+                  <td>{c.email}</td>
+                  <td>{c.phone ?? "Chưa có"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="muted small-text">
+          Hiển thị tối đa 100 khách có lịch hẹn hoặc đơn hàng tại cửa hàng này.
+          Hồ sơ thú cưng và lịch sử ở cửa hàng khác không được chia sẻ.
+        </p>
+      </details>
+      <div className="tenant-actions">
+        <a className="button outline" href="#catalog-management">
+          Sửa sản phẩm / dịch vụ
+        </a>
+        <a className="button outline" href="#gallery-manager">
+          Ảnh cửa hàng
+        </a>
+        <a className="button outline" href="#banner-manager">
+          Quản lý banner
+        </a>
+        {user.role === "SUPER_ADMIN" && (
+          <Link className="button outline" href="/platform">
+            Về quản trị tổng
+          </Link>
+        )}
+        {store.isActive ? (
+          <Link className="button outline" href={`/stores/${store.slug}`}>
+            Xem trang cửa hàng
+          </Link>
+        ) : (
+          <p className="error">Cửa hàng đang tạm ngưng.</p>
+        )}
+      </div>
+      <StoreSettings
+        store={{
+          id: store.id,
+          name: store.name,
+          description: store.description,
+          address: store.address,
+          phone: store.phone,
+        }}
+      />
+      <BannerManager
+        storeId={store.id}
+        slug={store.slug}
+        initial={readWebsite(store.website, store).banners}
+      />
+      <GalleryManager storeId={store.id} slug={store.slug} initial={gallery} />
+      <WebsiteEditor
+        storeId={store.id}
+        slug={store.slug}
+        initial={readWebsite(store.website, store)}
+      />
+      <div className="two-columns">
+        <CatalogCreate storeId={storeId} kind="products" />
+        <CatalogCreate storeId={storeId} kind="services" />
       </div>
       <AdminPanel
         bookings={bookings.map((b) => ({
@@ -101,7 +238,11 @@ export default async function Page() {
           })),
         }))}
         products={products.map((p) => ({ ...p, price: p.price.toString() }))}
-        services={services.map((s) => ({ ...s, price: s.price.toString() }))}
+        services={services.map((s) => ({
+          ...s,
+          price: s.price.toString(),
+          imageUrl: s.image ? `/api/services/${s.id}/image` : undefined,
+        }))}
       />
     </div>
   );

@@ -4,7 +4,12 @@ export async function request<T = unknown>(
 ): Promise<T> {
   const response = await fetch(url, {
     ...options,
-    headers: { "Content-Type": "application/json", ...options.headers },
+    headers: {
+      ...(options.body instanceof FormData
+        ? {}
+        : { "Content-Type": "application/json" }),
+      ...options.headers,
+    },
   });
   const data = await response
     .json()

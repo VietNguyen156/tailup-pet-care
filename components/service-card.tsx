@@ -4,6 +4,8 @@ import { ServiceIcon } from "./icons";
 import { money } from "@/lib/utils";
 export type ServiceView = {
   id: string;
+  storeId?: string;
+  store?: { id: string; name: string; slug: string };
   name: string;
   slug: string;
   category: string;
@@ -12,6 +14,7 @@ export type ServiceView = {
   durationMinutes: number;
   description: string;
   process: unknown;
+  imageUrl?: string;
 };
 export function ServiceCard({
   service,
@@ -22,6 +25,25 @@ export function ServiceCard({
 }) {
   return (
     <article className={`service-card service-${index % 4}`}>
+      {service.imageUrl && (
+        <Link
+          href={`/services/${service.slug}`}
+          aria-label={`Chi tiết ${service.name}`}
+        >
+          <img
+            src={service.imageUrl}
+            alt={service.name}
+            loading="lazy"
+            style={{
+              width: "100%",
+              aspectRatio: "3 / 2",
+              objectFit: "cover",
+              borderRadius: 8,
+              marginBottom: 20,
+            }}
+          />
+        </Link>
+      )}
       <div className="service-card-top">
         <span className="service-icon">
           <ServiceIcon name={service.icon} />
@@ -29,6 +51,14 @@ export function ServiceCard({
         <span className="small-number">0{index + 1}</span>
       </div>
       <span className="eyebrow">{service.category}</span>
+      {service.store && (
+        <Link
+          className="tenant-product-store"
+          href={`/stores/${service.store.slug}`}
+        >
+          {service.store.name}
+        </Link>
+      )}
       <Link href={`/services/${service.slug}`}>
         <h3>{service.name}</h3>
       </Link>
@@ -41,9 +71,9 @@ export function ServiceCard({
           </small>
         </div>
         <Link
-          href={`/booking?service=${service.id}`}
+          href={`/services/${service.slug}`}
           className="round-link"
-          aria-label={`Đặt lịch ${service.name}`}
+          aria-label={`Chi tiết ${service.name}`}
         >
           <ArrowUpRight />
         </Link>

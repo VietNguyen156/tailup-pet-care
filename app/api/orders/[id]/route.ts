@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { canManageStore } from "@/lib/permissions";
 import { requireUser } from "@/lib/auth";
 import { checkOrigin, errorResponse, ApiError, jsonBody } from "@/lib/http";
 import { serializable } from "@/lib/transaction";
@@ -29,7 +30,15 @@ export async function PATCH(
         include: { items: true },
       });
       if (!existing) throw new ApiError(404, "Không tìm thấy đơn hàng.");
-      const staff = user.role !== "CUSTOMER";
+      const staff = canManageStore(user, existing.storeId);
+      if (staff && user.role !== "SUPER_ADMIN") {
+        const store = await tx.store.findUnique({
+          where: { id: existing.storeId },
+          select: { isActive: true },
+        });
+        if (!store?.isActive)
+          throw new ApiError(403, "Cửa hàng đang tạm ngưng.");
+      }
       if (
         !staff &&
         (existing.userId !== user.id ||

@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
 } from "lucide-react";
 import { useState } from "react";
+import { accountHome } from "@/lib/permissions";
 import { request } from "@/lib/client";
 export function DashboardShell({
   user,
@@ -51,7 +52,7 @@ export function DashboardShell({
             </Link>
           ))}
           {user.role !== "CUSTOMER" && (
-            <Link href="/admin">
+            <Link href={accountHome(user.role)}>
               <LayoutDashboard size={18} />
               Quản trị TailUp
             </Link>

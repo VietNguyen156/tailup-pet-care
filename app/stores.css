@@ -1,0 +1,148 @@
+﻿.tenant-store-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin-block: 24px;
+}
+.tenant-store-grid .panel {
+  min-width: 0;
+}
+.tenant-store-grid p {
+  overflow-wrap: anywhere;
+}
+.tenant-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-block: 20px;
+}
+.tenant-create {
+  margin: 30px 0 45px;
+}
+.tenant-create > p {
+  max-width: 750px;
+}
+.tenant-create form {
+  max-width: 850px;
+}
+.tenant-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tenant-checkbox input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+.tenant-card-heading {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+}
+.tenant-card-heading h3 {
+  margin: 0;
+}
+.tenant-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+}
+.tenant-metrics dt {
+  color: var(--muted);
+  font-size: 13px;
+}
+.tenant-metrics dd {
+  font-size: 20px;
+  margin: 5px 0;
+  font-weight: 600;
+}
+.tenant-settings {
+  margin-block: 16px;
+}
+.tenant-settings summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.tenant-settings form {
+  margin-top: 20px;
+}
+.tenant-store-hero {
+  padding: 36px;
+  background: #eee4de;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.tenant-store-hero h1 {
+  margin: 12px 0 20px;
+}
+.tenant-store-hero p {
+  max-width: 750px;
+  white-space: pre-line;
+}
+.tenant-product-store {
+  display: block;
+  color: var(--clay);
+  font-size: 13px;
+  margin-block: 10px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.tenant-cart-selector {
+  display: grid;
+  gap: 8px;
+  font-size: 16px;
+  margin-bottom: 15px;
+}
+.tenant-no-image {
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+}
+.admin-stats .stat-card strong {
+  font-size: clamp(20px, 2.1vw, 30px);
+  overflow-wrap: anywhere;
+}
+@media (max-width: 760px) {
+  .tenant-store-grid {
+    grid-template-columns: 1fr;
+  }
+  .tenant-store-hero {
+    padding: 25px;
+  }
+  .tenant-metrics {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.catalog-editor {
+  padding: 20px;
+  white-space: normal;
+}
+.catalog-editor fieldset {
+  border: 0;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+.catalog-editor label {
+  display: grid;
+  gap: 8px;
+}
+.catalog-editor input:not([type="checkbox"]),
+.catalog-editor textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+.catalog-editor .checkbox-label {
+  display: flex;
+  align-items: center;
+}
+.catalog-editor summary {
+  overflow-wrap: anywhere;
+}

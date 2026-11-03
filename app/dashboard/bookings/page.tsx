@@ -9,7 +9,12 @@ export default async function Page() {
   const user = await requirePageUser();
   const bookings = await db.booking.findMany({
     where: { userId: user.id },
-    include: { pet: true, service: true, staff: { select: { name: true } } },
+    include: {
+      store: { select: { name: true, slug: true } },
+      pet: true,
+      service: true,
+      staff: { select: { name: true } },
+    },
     orderBy: { createdAt: "desc" },
     take: 100,
   });
@@ -30,6 +35,12 @@ export default async function Page() {
       {bookings.length ? (
         bookings.map((b) => (
           <article className="list-card" key={b.id}>
+            <Link
+              className="tenant-product-store"
+              href={`/stores/${b.store.slug}`}
+            >
+              {b.store.name}
+            </Link>
             <div className="list-card-head">
               <div>
                 <h3>{b.service.name}</h3>

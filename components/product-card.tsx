@@ -7,6 +7,9 @@ import { money } from "@/lib/utils";
 import { ProductArt } from "./product-art";
 export type ProductView = {
   id: string;
+  storeId?: string;
+  store?: { id: string; name: string; slug: string };
+  imageUrl?: string;
   name: string;
   slug: string;
   category: string;
@@ -56,8 +59,16 @@ export function ProductCard({ product }: { product: ProductView }) {
         aria-label={product.name}
       >
         <span className="product-tag">{product.category}</span>
-        <ProductArt id={product.id} />
+        <ProductArt id={product.id} src={product.imageUrl} />
       </Link>
+      {product.store && (
+        <Link
+          className="tenant-product-store"
+          href={`/stores/${product.store.slug}`}
+        >
+          {product.store.name}
+        </Link>
+      )}
       <div className="product-info">
         <div>
           <Link href={`/shop/${product.slug}`}>

@@ -15,7 +15,14 @@ export const currentUser = cache(async () => {
     where: { tokenHash: digest(token) },
     include: {
       user: {
-        select: { id: true, name: true, email: true, phone: true, role: true },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          role: true,
+          storeId: true,
+        },
       },
     },
   });
@@ -45,12 +52,6 @@ export async function destroySession() {
 export async function requireUser() {
   const user = await currentUser();
   if (!user) throw new ApiError(401, "Vui lòng đăng nhập để tiếp tục.");
-  return user;
-}
-export async function requireStaff() {
-  const user = await requireUser();
-  if (user.role !== "STAFF" && user.role !== "ADMIN")
-    throw new ApiError(403, "Bạn không có quyền truy cập.");
   return user;
 }
 export async function requirePageUser() {

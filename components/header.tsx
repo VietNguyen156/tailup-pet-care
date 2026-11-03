@@ -2,8 +2,10 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ShoppingBag, Menu, X, PawPrint } from "lucide-react";
+import { LogoutButton } from "./logout-button";
 import { useState } from "react";
 import { useCart } from "./cart-provider";
+import { accountHome } from "@/lib/permissions";
 import { request } from "@/lib/client";
 type User = { name: string; role: string } | null;
 export function Header({ user }: { user: User }) {
@@ -13,6 +15,7 @@ export function Header({ user }: { user: User }) {
     [error, setError] = useState("");
   const { count } = useCart();
   const links = [
+    ["/stores", "Cửa hàng"],
     ["/services", "Dịch vụ"],
     ["/#how-it-works", "Cách đặt lịch"],
     ["/#faq", "Câu hỏi thường gặp"],
@@ -27,6 +30,7 @@ export function Header({ user }: { user: User }) {
       setError((e as Error).message);
     }
   }
+  if (/^\/stores\/[^/]+/.test(path)) return null;
   return (
     <>
       <header className="site-header">
@@ -45,9 +49,9 @@ export function Header({ user }: { user: User }) {
                 {label}
               </Link>
             ))}
-
           </nav>
           <div className="header-actions">
+            {user && <LogoutButton />}
             <Link
               href="/cart"
               className="icon-button cart-link"
@@ -57,7 +61,7 @@ export function Header({ user }: { user: User }) {
               {count > 0 && <span>{count}</span>}
             </Link>
             {user ? (
-              <Link className="account-link" href="/dashboard">
+              <Link className="account-link" href={accountHome(user.role)}>
                 Chào, {user.name.split(" ").pop()}
               </Link>
             ) : (
@@ -65,7 +69,10 @@ export function Header({ user }: { user: User }) {
                 Đăng nhập
               </Link>
             )}
-            <Link href={user ? "/booking" : "/register"} className="button outline desktop-book">
+            <Link
+              href={user ? "/booking" : "/register"}
+              className="button outline desktop-book"
+            >
               {user ? "Đặt lịch" : "Đăng ký"}
             </Link>
             <button
@@ -89,12 +96,16 @@ export function Header({ user }: { user: User }) {
               Đặt lịch chăm sóc
             </Link>
             <Link
-              href={user ? "/dashboard" : "/login"}
+              href={user ? accountHome(user.role) : "/login"}
               onClick={() => setOpen(false)}
             >
               {user ? "Tài khoản của tôi" : "Đăng nhập"}
             </Link>
-            {!user && <Link href="/register" onClick={() => setOpen(false)}>Đăng ký</Link>}
+            {!user && (
+              <Link href="/register" onClick={() => setOpen(false)}>
+                Đăng ký
+              </Link>
+            )}
             {user && <button onClick={logout}>Đăng xuất</button>}
           </nav>
         )}

@@ -9,8 +9,8 @@ datasource db {
 
 enum Role {
   CUSTOMER
-  STAFF
-  ADMIN
+  STORE_ADMIN
+  SUPER_ADMIN
 }
 
 enum PetType {
@@ -44,6 +44,27 @@ enum OrderStatus {
   CANCELLED
 }
 
+model Store {
+  galleryImages StoreGalleryImage[]
+  website Json?
+  banners StoreBanner[]
+  id          String            @id @default(cuid())
+  name        String            @db.VarChar(160)
+  slug        String            @unique @db.VarChar(100)
+  description String            @db.Text
+  address     String            @db.VarChar(500)
+  phone       String            @db.VarChar(20)
+  isActive    Boolean           @default(true)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  admins      User[]
+  services    Service[]
+  products    Product[]
+  bookings    Booking[]
+  orders      Order[]
+  slots       AppointmentSlot[]
+}
+
 model User {
   id               String    @id @default(cuid())
   name             String    @db.VarChar(100)
@@ -51,6 +72,8 @@ model User {
   phone            String?   @db.VarChar(20)
   passwordHash     String    @db.VarChar(255)
   role             Role      @default(CUSTOMER)
+  storeId          String?
+  store            Store?    @relation(fields: [storeId], references: [id], onDelete: Restrict)
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
   pets             Pet[]
@@ -61,6 +84,7 @@ model User {
   reviews          Review[]
   sessions         Session[]
 
+  @@index([storeId])
   @@index([role])
 }
 
@@ -101,6 +125,10 @@ model Pet {
 }
 
 model Service {
+  image ServiceImage?
+  deletedAt DateTime?
+  storeId         String
+  store           Store     @relation(fields: [storeId], references: [id], onDelete: Restrict)
   id              String    @id @default(cuid())
   name            String    @db.VarChar(160)
   slug            String    @unique @db.VarChar(191)
@@ -114,20 +142,33 @@ model Service {
   bookings        Booking[]
   reviews         Review[]
 
+  @@index([storeId])
   @@index([isActive, category])
 }
 
+model ServiceImage {
+  serviceId String @id
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  data Bytes @db.MediumBlob
+  contentType String @db.VarChar(30)
+}
+
 model AppointmentSlot {
+  storeId     String
+  store       Store     @relation(fields: [storeId], references: [id], onDelete: Restrict)
   id          String    @id @default(cuid())
   bookingDate DateTime  @db.Date
   timeSlot    String    @db.VarChar(5)
   capacity    Int       @default(3)
   bookings    Booking[]
 
-  @@unique([bookingDate, timeSlot])
+  @@unique([storeId, bookingDate, timeSlot])
+  @@index([storeId])
 }
 
 model Booking {
+  storeId      String
+  store        Store           @relation(fields: [storeId], references: [id], onDelete: Restrict)
   id           String          @id @default(cuid())
   userId       String
   petId        String
@@ -149,6 +190,7 @@ model Booking {
   staff        User?           @relation("AssignedBookings", fields: [staffId], references: [id], onDelete: Restrict)
   slot         AppointmentSlot @relation(fields: [slotId], references: [id], onDelete: Restrict)
 
+  @@index([storeId])
   @@index([bookingDate, timeSlot, status])
   @@index([userId, createdAt])
   @@index([staffId, bookingDate, status])
@@ -156,6 +198,9 @@ model Booking {
 }
 
 model Product {
+  deletedAt DateTime?
+  storeId     String
+  store       Store          @relation(fields: [storeId], references: [id], onDelete: Restrict)
   id          String         @id @default(cuid())
   name        String         @db.VarChar(160)
   slug        String         @unique @db.VarChar(191)
@@ -170,6 +215,7 @@ model Product {
   orderItems  OrderItem[]
   reviews     Review[]
 
+  @@index([storeId])
   @@index([isActive, category])
 }
 
@@ -185,6 +231,8 @@ model ProductImage {
 }
 
 model Order {
+  storeId       String
+  store         Store         @relation(fields: [storeId], references: [id], onDelete: Restrict)
   id            String        @id @default(cuid())
   userId        String
   totalAmount   Decimal       @db.Decimal(14, 0)
@@ -200,6 +248,7 @@ model Order {
   user          User          @relation(fields: [userId], references: [id], onDelete: Restrict)
   items         OrderItem[]
 
+  @@index([storeId])
   @@index([userId, createdAt])
   @@index([status, paymentStatus])
 }
@@ -249,4 +298,26 @@ model Review {
   @@unique([userId, productId])
   @@index([serviceId, createdAt])
   @@index([productId, createdAt])
+}
+
+model StoreBanner {
+  storeId String
+  slot Int
+  contentType String @db.VarChar(30)
+  data Bytes @db.MediumBlob
+  updatedAt DateTime @updatedAt
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@id([storeId, slot])
+}
+
+model StoreGalleryImage {
+  id String @id @default(cuid())
+  storeId String
+  alt String @db.VarChar(160)
+  data Bytes @db.MediumBlob
+  contentType String @db.VarChar(30)
+  createdAt DateTime @default(now())
+  store Store @relation(fields:[storeId],references:[id],onDelete:Cascade)
+  @@index([storeId,createdAt])
 }
