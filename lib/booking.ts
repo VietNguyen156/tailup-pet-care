@@ -3,12 +3,18 @@ import { ApiError } from "./http";
 import { serializable } from "./transaction";
 import { assertFutureSlot, TIME_SLOTS, type BookingInput } from "./validation";
 export const ACTIVE_STATUSES = ["PENDING", "CONFIRMED"] as const;
-export async function createBooking(userId: string, input: BookingInput) {
+export async function createBooking(
+  userId: string,
+  input: BookingInput,
+  petImage?: { data: Uint8Array; contentType: string } | null,
+) {
   if (!assertFutureSlot(input.bookingDate, input.timeSlot))
     throw new ApiError(
       400,
       "Vui lòng chọn giờ trong tương lai, tối đa 90 ngày tới.",
     );
+  if (petImage && input.petId)
+    throw new ApiError(400, "Chỉ có thể thêm ảnh khi tạo thú cưng mới.");
   return serializable(async (tx) => {
     const service = await tx.service.findFirst({
       where: {
@@ -95,7 +101,21 @@ export async function createBooking(userId: string, input: BookingInput) {
         );
     } else {
       const pet = await tx.pet.create({
-        data: { userId, name: input.newPetName!, type: input.newPetType! },
+        data: {
+          userId,
+          name: input.newPetName!,
+          type: input.newPetType!,
+          ...(petImage
+            ? {
+                image: {
+                  create: {
+                    data: new Uint8Array(petImage.data).slice(),
+                    contentType: petImage.contentType,
+                  },
+                },
+              }
+            : {}),
+        },
       });
       petId = pet.id;
     }

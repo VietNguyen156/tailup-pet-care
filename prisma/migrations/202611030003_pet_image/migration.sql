@@ -1,0 +1,9 @@
+CREATE TABLE `PetImage` (
+  `petId` VARCHAR(191) NOT NULL,
+  `data` MEDIUMBLOB NOT NULL,
+  `contentType` VARCHAR(30) NOT NULL,
+  PRIMARY KEY (`petId`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+ALTER TABLE `PetImage` ADD CONSTRAINT `PetImage_petId_fkey`
+  FOREIGN KEY (`petId`) REFERENCES `Pet`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

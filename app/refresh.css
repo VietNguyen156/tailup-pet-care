@@ -21,6 +21,11 @@ p { color: var(--muted); }
 .reference-hero-copy > p { font-size: 17px; line-height: 1.9; margin-bottom: 32px; max-width: 530px; }
 .reference-hero-copy .hero-buttons { gap: 22px; }
 .reference-hero-copy .text-link { border: 0; font-size: 14px; padding: 12px 0; }
+.reference-hero-copy .hero-ctas { gap: 14px; }
+.reference-hero-copy .hero-ctas .button { min-height: 52px; padding-inline: 20px; }
+.reference-hero-copy .hero-ctas .button.outline { background: #fffdfb; border-color: #b7c0ae; }
+.reference-hero-copy .hero-ctas .button.outline:hover { background: #f0e9e5; }
+.reference-hero-copy .hero-ctas .button:focus-visible { outline: 3px solid #c68e73; outline-offset: 3px; }
 .reference-hero-note { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); margin-top: 28px; }
 .reference-hero-note svg { flex-shrink: 0; }
 .reference-hero-image { margin: 0; overflow: hidden; border-radius: 9px; background: #eee1da; }
@@ -138,8 +143,8 @@ input, select, textarea { font-size: 16px; }
   .logo { font-size: 29px; }
   .header-actions { gap: 6px; }
   .account-link { font-size: 13px; }
-  .reference-hero-copy .hero-buttons { gap: 12px; }
-  .reference-hero-copy .hero-buttons .button { font-size: 13px; padding: 14px 17px; }
+  .reference-hero-copy .hero-ctas { gap: 10px; }
+  .reference-hero-copy .hero-ctas .button { flex: 1 1 100%; justify-content: space-between; font-size: 13px; padding: 14px 17px; }
   .reference-hero-note { font-size: 12px; }
   .reference-hero-image figcaption { padding: 17px 20px; }
   .services-grid { grid-template-columns: 1fr; }

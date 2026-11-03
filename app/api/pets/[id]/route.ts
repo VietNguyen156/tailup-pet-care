@@ -4,18 +4,31 @@ import { requireUser } from "@/lib/auth";
 import { checkOrigin, errorResponse, ApiError, jsonBody } from "@/lib/http";
 import { petSchema } from "@/lib/validation";
 import { petData } from "@/lib/pet-data";
+import { petInput } from "@/lib/pet-input";
 type Context = { params: Promise<{ id: string }> };
 export async function PATCH(request: Request, context: Context) {
   try {
     checkOrigin(request);
     const user = await requireUser();
     const { id } = await context.params;
-    const input = petSchema.parse(await jsonBody(request));
-    const result = await db.pet.updateMany({
-      where: { id, userId: user.id },
-      data: petData(input),
+    const body = await petInput(request);
+    const input = petSchema.parse(body.input);
+    await db.$transaction(async (tx) => {
+      const result = await tx.pet.updateMany({
+        where: { id, userId: user.id },
+        data: petData(input),
+      });
+      if (!result.count) throw new ApiError(404, "Không tìm thấy thú cưng.");
+      if (body.image) {
+        await tx.petImage.upsert({
+          where: { petId: id },
+          create: { petId: id, ...body.image },
+          update: body.image,
+        });
+      } else if (body.removeImage) {
+        await tx.petImage.deleteMany({ where: { petId: id } });
+      }
     });
-    if (!result.count) throw new ApiError(404, "Không tìm thấy thú cưng.");
     return NextResponse.json({ success: true });
   } catch (e) {
     return errorResponse(e);

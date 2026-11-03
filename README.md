@@ -76,11 +76,11 @@ Admin/Staff vào `/admin`; khách hàng vào `/dashboard/pets`. Đăng ký công
 ## 3. Những gì đã có
 
 - Trang chủ, giới thiệu và điều hướng responsive.
-- Danh sách/chi tiết dịch vụ, giá, thời lượng và quy trình.
+- Khách chọn cửa hàng trước khi xem dịch vụ; mỗi trang cửa hàng chỉ hiển thị dịch vụ, giá, thời lượng và quy trình của cửa hàng đó.
 - Danh sách/chi tiết sản phẩm; tìm tên, lọc danh mục, sắp xếp giá.
 - Giỏ hàng lưu trong trình duyệt; thay đổi số lượng, xóa sản phẩm.
 - Đăng ký, đăng nhập, đăng xuất; mật khẩu băm scrypt có salt, phiên đăng nhập lưu bằng cookie HttpOnly và token băm trong database.
-- Hồ sơ thú cưng: thêm, sửa, xóa, giống, cân nặng, ngày sinh, lịch sử tiêm và ngày chăm sóc tiếp theo. Tuổi được tính từ ngày sinh.
+- Hồ sơ thú cưng: thêm, sửa, xóa, tải ảnh JPG/PNG/WebP tối đa 2 MB, giống, cân nặng, ngày sinh, lịch sử tiêm và ngày chăm sóc tiếp theo. Tuổi được tính từ ngày sinh.
 - Đặt lịch 3 bước, React Hook Form + Zod, chọn thú cưng có sẵn hoặc tạo bé mới, chọn nhân viên tùy ý, xem giờ trống và ghi chú.
 - Theo dõi/hủy lịch hẹn của mình.
 - Tạo đơn COD, tính giá tại server, kiểm tra tồn kho và trừ tồn kho trong transaction.

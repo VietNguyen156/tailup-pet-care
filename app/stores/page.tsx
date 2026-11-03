@@ -1,13 +1,9 @@
-import { catalogStoreId } from "@/lib/catalog-scope";
-import Link from "next/link";
-import { db } from "@/lib/db";
+import { StoreChoices } from "@/components/store-choices";
+import { getStoreDirectory } from "@/lib/store-directory";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Các cửa hàng trên TailUp" };
 export default async function Page() {
-  const stores = await db.store.findMany({
-    where: { isActive: true, id: await catalogStoreId() },
-    orderBy: { name: "asc" },
-  });
+  const stores = await getStoreDirectory();
   return (
     <div className="container page-space">
       <div className="page-intro">
@@ -18,23 +14,7 @@ export default async function Page() {
           đặt lịch.
         </p>
       </div>
-      <div className="tenant-store-grid">
-        {stores.map((s) => (
-          <article key={s.id} className="panel">
-            <span className="eyebrow">CỬA HÀNG TRÊN TAILUP</span>
-            <h2>{s.name}</h2>
-            <p>{s.description}</p>
-            {s.address && <p>{s.address}</p>}
-            {s.phone && <p>Điện thoại: {s.phone}</p>}
-            <Link className="button" href={`/stores/${s.slug}`}>
-              Ghé cửa hàng
-            </Link>
-          </article>
-        ))}
-      </div>
-      {!stores.length && (
-        <p className="empty-state">Chưa có cửa hàng đang hoạt động.</p>
-      )}
+      <StoreChoices stores={stores} />
     </div>
   );
 }

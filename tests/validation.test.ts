@@ -82,6 +82,8 @@ test("future-time checks use UTC+7 and reject bookings outside 90 days", () => {
 });
 test("pet weight must be positive and birthday cannot be in future", () => {
   const pet = { name: "Milo", type: "CAT" };
+  assert.equal(petSchema.safeParse(pet).success, true);
+  assert.equal(petSchema.safeParse({ ...pet, birthDate: "" }).success, true);
   assert.equal(
     petSchema.safeParse({ ...pet, weight: "4.25", birthDate: "2020-01-01" })
       .success,

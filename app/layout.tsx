@@ -3,6 +3,7 @@ import { currentUser } from "@/lib/auth";
 import { CartProvider } from "@/components/cart-provider";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import { BotpressChat } from "@/components/botpress-chat";
 import "./globals.css";
 import "./refresh.css";
 import "./auth.css";
@@ -38,6 +39,7 @@ export default async function RootLayout({
           <PlatformFooter>
             <Footer />
           </PlatformFooter>
+          <BotpressChat />
         </CartProvider>
       </body>
     </html>

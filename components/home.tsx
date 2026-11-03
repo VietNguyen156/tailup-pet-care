@@ -7,13 +7,14 @@ import {
   Heart,
   Clock3,
 } from "lucide-react";
-import { ServiceCard, type ServiceView } from "./service-card";
 import { ProductCard, type ProductView } from "./product-card";
+import { StoreChoices } from "./store-choices";
+import type { StoreDirectoryItem } from "@/lib/store-directory";
 export function Home({
-  services,
+  stores,
   products,
 }: {
-  services: ServiceView[];
+  stores: StoreDirectoryItem[];
   products: ProductView[];
 }) {
   return (
@@ -24,7 +25,14 @@ export function Home({
             <span className="eyebrow">MỘT CHÚT CHĂM SÓC, THẬT NHIỀU YÊU THƯƠNG</span>
             <h1>Chăm chút mỗi ngày,<br /><em>yêu thương trọn vẹn.</em></h1>
             <p>Một lần tắm thơm, một bộ lông gọn gàng. Cùng TailUp chuẩn bị những buổi grooming cho bé — từ chọn dịch vụ, xem giá đến đặt lịch.</p>
-            <div className="hero-buttons"><Link href="/booking" className="button">Đặt lịch chăm sóc <ArrowRight size={19} /></Link><Link href="#services" className="text-link">Khám phá dịch vụ <ArrowRight size={18} /></Link></div>
+            <div className="hero-buttons hero-ctas">
+              <Link href="/stores" className="button outline">
+                Chọn cửa hàng <ArrowRight size={18} />
+              </Link>
+              <Link href="/booking" className="button">
+                Chọn cửa hàng & đặt lịch <ArrowRight size={19} />
+              </Link>
+            </div>
             <div className="reference-hero-note"><PawPrint size={20} /> Cho những người bạn nhỏ, và người thương các bé.</div>
           </div>
           <figure className="reference-hero-image"><img src="/tailup-companions.webp" alt="Chú chó Golden và mèo xám trắng ngồi bên nhau" width={1100} height={1100} fetchPriority="high" /><figcaption><Heart size={23} /><span>Những điều nhỏ bé.<br /><strong>Một tình yêu thật lớn.</strong></span><PawPrint size={24} /></figcaption></figure>
@@ -49,18 +57,17 @@ export function Home({
       <section className="section container" id="services">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">MỘT CHÚT CHĂM CHÚT</span>
-            <h2>Bé cần gì, có TailUp.</h2>
+            <span className="eyebrow">DỊCH VỤ RIÊNG CHO TỪNG CỬA HÀNG</span>
+            <h2>Chọn cửa hàng gần bạn.</h2>
+            <p className="muted">
+              Mỗi cửa hàng có dịch vụ và lịch chăm sóc riêng.
+            </p>
           </div>
-          <Link href="/services" className="text-link">
-            Tất cả dịch vụ <ArrowUpRight size={19} />
+          <Link href="/stores" className="text-link">
+            Tất cả cửa hàng <ArrowUpRight size={19} />
           </Link>
         </div>
-        <div className="services-grid">
-          {services.map((s, i) => (
-            <ServiceCard key={s.id} service={s} index={i} />
-          ))}
-        </div>
+        <StoreChoices stores={stores} />
       </section>
       <section className="booking-guide container section" id="how-it-works"><span className="eyebrow">DỄ DÀNG TỪ BƯỚC ĐẦU TIÊN</span><h2>Một lịch hẹn, ba bước nhỏ.</h2><ol><li><span>01</span><h3>Thêm hồ sơ của bé</h3><p>Cho chúng mình biết tên, giống và những điều cần lưu ý khi chăm sóc bé.</p></li><li><span>02</span><h3>Chọn dịch vụ & khung giờ</h3><p>Xem trước giá, thời lượng và chọn lịch phù hợp với bạn.</p></li><li><span>03</span><h3>Xác nhận và theo dõi</h3><p>Kiểm tra thông tin và theo dõi trạng thái trong tài khoản của bạn.</p></li></ol></section>
       <section className="section container">

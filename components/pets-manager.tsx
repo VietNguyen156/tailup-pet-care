@@ -24,6 +24,7 @@ export type PetView = {
   vaccinationHistory: string | null;
   nextVaccinationAt: string | null;
   nextDewormingAt: string | null;
+  imageUrl: string | null;
 };
 export function PetsManager({ pets }: { pets: PetView[] }) {
   const router = useRouter();
@@ -31,7 +32,10 @@ export function PetsManager({ pets }: { pets: PetView[] }) {
     [open, setOpen] = useState(false),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
-    [deleting, setDeleting] = useState<PetView | null>(null);
+    [deleting, setDeleting] = useState<PetView | null>(null),
+    [imageFile, setImageFile] = useState<File | null>(null),
+    [removeImage, setRemoveImage] = useState(false),
+    [imagePreview, setImagePreview] = useState("");
   const modal = useRef<HTMLDialogElement>(null),
     deleteModal = useRef<HTMLDialogElement>(null);
   useEffect(() => {
@@ -42,9 +46,20 @@ export function PetsManager({ pets }: { pets: PetView[] }) {
     if (deleting) deleteModal.current?.showModal();
     else deleteModal.current?.close();
   }, [deleting]);
+  useEffect(() => {
+    if (!imageFile) {
+      setImagePreview("");
+      return;
+    }
+    const url = URL.createObjectURL(imageFile);
+    setImagePreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [imageFile]);
   function launch(pet: PetView | null) {
     setEditing(pet);
     setError("");
+    setImageFile(null);
+    setRemoveImage(false);
     setOpen(true);
   }
   const inputDate = (date: string | null | undefined) =>
@@ -69,8 +84,14 @@ export function PetsManager({ pets }: { pets: PetView[] }) {
               pet.type === "CAT" ? Cat : pet.type === "DOG" ? Dog : PawPrint;
             return (
               <article className="pet-card" key={pet.id}>
-                <div className={`pet-avatar avatar-${i % 3}`}>
-                  <Icon size={48} strokeWidth={1.3} />
+                <div
+                  className={`pet-avatar avatar-${i % 3}${pet.imageUrl ? " has-photo" : ""}`}
+                >
+                  {pet.imageUrl ? (
+                    <img src={pet.imageUrl} alt={`Ảnh của ${pet.name}`} />
+                  ) : (
+                    <Icon size={48} strokeWidth={1.3} />
+                  )}
                   <span>{petLabel(pet.type)}</span>
                 </div>
                 <div className="pet-card-body">
@@ -189,13 +210,22 @@ export function PetsManager({ pets }: { pets: PetView[] }) {
               e.preventDefault();
               setBusy(true);
               setError("");
-              const data = Object.fromEntries(new FormData(e.currentTarget));
+              const values = new FormData(e.currentTarget);
+              const image = values.get("image");
+              const shouldRemoveImage = values.get("removeImage") === "on";
+              values.delete("image");
+              values.delete("removeImage");
+              const body = new FormData();
+              body.set("data", JSON.stringify(Object.fromEntries(values)));
+              if (image instanceof File && image.size)
+                body.set("image", image);
+              if (shouldRemoveImage) body.set("removeImage", "true");
               try {
                 await request(
                   editing ? `/api/pets/${editing.id}` : "/api/pets",
                   {
                     method: editing ? "PATCH" : "POST",
-                    body: JSON.stringify(data),
+                    body,
                   },
                 );
                 setOpen(false);
@@ -236,6 +266,56 @@ export function PetsManager({ pets }: { pets: PetView[] }) {
                 defaultValue={editing?.breed ?? ""}
               />
             </label>
+            <div className="pet-photo-input">
+              <label>
+                Ảnh thú cưng (không bắt buộc)
+                <input
+                  name="image"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={(event) => {
+                    const selected = event.target.files?.[0] ?? null;
+                    const invalid =
+                      selected &&
+                      (!["image/jpeg", "image/png", "image/webp"].includes(
+                        selected.type,
+                      ) ||
+                        selected.size > 2 * 1024 * 1024);
+                    event.target.setCustomValidity(
+                      invalid
+                        ? "Chọn ảnh JPG, PNG hoặc WebP tối đa 2 MB."
+                        : "",
+                    );
+                    setError(
+                      invalid
+                        ? "Chọn ảnh JPG, PNG hoặc WebP tối đa 2 MB."
+                        : "",
+                    );
+                    setImageFile(invalid ? null : selected);
+                    if (selected && !invalid) setRemoveImage(false);
+                  }}
+                />
+              </label>
+              <small>JPG, PNG hoặc WebP, tối đa 2 MB.</small>
+              {(imagePreview || (editing?.imageUrl && !removeImage)) && (
+                <img
+                  className="pet-photo-preview"
+                  src={imagePreview || editing?.imageUrl || ""}
+                  alt="Xem trước ảnh thú cưng"
+                />
+              )}
+              {editing?.imageUrl && (
+                <label className="pet-photo-remove">
+                  <input
+                    name="removeImage"
+                    type="checkbox"
+                    checked={removeImage}
+                    onChange={(event) => setRemoveImage(event.target.checked)}
+                  />
+                  Xóa ảnh hiện tại
+                </label>
+              )}
+            </div>
             <div className="two-columns">
               <label>
                 Cân nặng (kg)
@@ -249,7 +329,7 @@ export function PetsManager({ pets }: { pets: PetView[] }) {
                 />
               </label>
               <label>
-                Ngày sinh
+                Ngày sinh (không bắt buộc)
                 <input
                   name="birthDate"
                   type="date"

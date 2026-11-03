@@ -39,7 +39,9 @@ export function BookingForm({
     [loadingSlots, setLoadingSlots] = useState(false),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
-    [bookingId, setBookingId] = useState("");
+    [bookingId, setBookingId] = useState(""),
+    [newPetImage, setNewPetImage] = useState<File | null>(null),
+    [newPetImagePreview, setNewPetImagePreview] = useState("");
   const {
     register,
     watch,
@@ -67,6 +69,15 @@ export function BookingForm({
     petId = watch("petId"),
     petName = watch("newPetName");
   const service = services.find((s) => s.id === serviceId);
+  useEffect(() => {
+    if (!newPetImage) {
+      setNewPetImagePreview("");
+      return;
+    }
+    const url = URL.createObjectURL(newPetImage);
+    setNewPetImagePreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [newPetImage]);
   useEffect(() => {
     if (!date || !serviceId) {
       setSlots([]);
@@ -154,9 +165,18 @@ export function BookingForm({
             setBusy(true);
             setError("");
             try {
+              const body =
+                newPet && newPetImage
+                  ? (() => {
+                      const form = new FormData();
+                      form.set("data", JSON.stringify(data));
+                      form.set("image", newPetImage);
+                      return form;
+                    })()
+                  : JSON.stringify(data);
               const result = await request<{ booking: { id: string } }>(
                 "/api/bookings",
-                { method: "POST", body: JSON.stringify(data) },
+                { method: "POST", body },
               );
               setBookingId(result.booking.id);
               router.refresh();
@@ -220,6 +240,7 @@ export function BookingForm({
                           setNewPet(!newPet);
                           setValue("petId", !newPet ? "" : (pets[0]?.id ?? ""));
                           setValue("newPetName", "");
+                          setNewPetImage(null);
                         }}
                       >
                         {newPet ? "Chọn bé đã có" : "+ Thêm bé mới"}
@@ -255,6 +276,47 @@ export function BookingForm({
                         <option value="CAT">Mèo</option>
                         <option value="OTHER">Khác</option>
                       </select>
+                    </div>
+                  )}
+                  {newPet && (
+                    <div className="pet-photo-input booking-pet-photo">
+                      <label>
+                        Ảnh thú cưng (không bắt buộc)
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          onChange={(event) => {
+                            const selected = event.target.files?.[0] ?? null;
+                            const invalid =
+                              selected &&
+                              (![
+                                "image/jpeg",
+                                "image/png",
+                                "image/webp",
+                              ].includes(selected.type) ||
+                                selected.size > 2 * 1024 * 1024);
+                            event.target.setCustomValidity(
+                              invalid
+                                ? "Chọn ảnh JPG, PNG hoặc WebP tối đa 2 MB."
+                                : "",
+                            );
+                            setError(
+                              invalid
+                                ? "Chọn ảnh JPG, PNG hoặc WebP tối đa 2 MB."
+                                : "",
+                            );
+                            setNewPetImage(invalid ? null : selected);
+                          }}
+                        />
+                      </label>
+                      <small>JPG, PNG hoặc WebP, tối đa 2 MB.</small>
+                      {newPetImagePreview && (
+                        <img
+                          className="pet-photo-preview"
+                          src={newPetImagePreview}
+                          alt="Xem trước ảnh thú cưng mới"
+                        />
+                      )}
                     </div>
                   )}
                   {errors.petId && (

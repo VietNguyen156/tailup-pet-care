@@ -1749,6 +1749,21 @@ label > .password-field {
   position: relative;
   color: #869477;
 }
+.pet-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.pet-avatar.has-photo {
+  height: auto;
+  aspect-ratio: 16 / 9;
+  padding: 10px;
+  background: linear-gradient(135deg, #f3eee7, #e8ecde);
+}
+.pet-avatar.has-photo img {
+  object-fit: contain;
+  border-radius: 8px;
+}
 .pet-avatar > span {
   position: absolute;
   bottom: 12px;
@@ -1757,6 +1772,25 @@ label > .password-field {
   background: #fff9;
   padding: 2px 8px;
   border-radius: 20px;
+}
+.pet-photo-input {
+  display: grid;
+  gap: 8px;
+}
+.pet-photo-input small {
+  color: var(--muted);
+}
+.pet-photo-preview {
+  width: 100%;
+  max-width: 360px;
+  max-height: 240px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+.pet-photo-remove {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 .avatar-1 {
   background: #f0e5d8;
@@ -1891,6 +1925,38 @@ label > .password-field {
 .modal::backdrop {
   background: #18372b70;
   backdrop-filter: blur(4px);
+}
+@media (max-width: 760px) {
+  .bpFabWrapper {
+    right: 14px !important;
+    bottom: calc(88px + env(safe-area-inset-bottom)) !important;
+  }
+  .bpWebchat:not(.bpWebchatExpanded) {
+    width: calc(100vw - 24px) !important;
+    height: min(
+      450px,
+      calc(100dvh - 116px - env(safe-area-inset-bottom))
+    ) !important;
+    right: 12px !important;
+    bottom: calc(88px + env(safe-area-inset-bottom)) !important;
+    border-radius: 18px !important;
+  }
+  .bpMessagePreview {
+    right: 14px !important;
+    bottom: calc(168px + env(safe-area-inset-bottom)) !important;
+    max-width: calc(100vw - 28px);
+  }
+}
+@media (min-width: 761px) {
+  .bpWebchat:not(.bpWebchatExpanded) {
+    width: min(360px, calc(100vw - 32px)) !important;
+    height: min(450px, calc(100vh - 120px)) !important;
+  }
+}
+body.botpress-disabled .bpFabWrapper,
+body.botpress-disabled .bpWebchat,
+body.botpress-disabled .bpMessagePreview {
+  display: none !important;
 }
 .modal-heading {
   display: flex;
