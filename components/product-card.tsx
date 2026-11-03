@@ -57,6 +57,7 @@ export function ProductCard({ product }: { product: ProductView }) {
         href={`/shop/${product.slug}`}
         className={`product-image ${product.color}`}
         aria-label={product.name}
+        prefetch={false}
       >
         <span className="product-tag">{product.category}</span>
         <ProductArt id={product.id} src={product.imageUrl} />
@@ -65,13 +66,14 @@ export function ProductCard({ product }: { product: ProductView }) {
         <Link
           className="tenant-product-store"
           href={`/stores/${product.store.slug}`}
+          prefetch={false}
         >
           {product.store.name}
         </Link>
       )}
       <div className="product-info">
         <div>
-          <Link href={`/shop/${product.slug}`}>
+          <Link href={`/shop/${product.slug}`} prefetch={false}>
             <h3>{product.name}</h3>
           </Link>
           <span className="product-price">{money(product.price)}</span>

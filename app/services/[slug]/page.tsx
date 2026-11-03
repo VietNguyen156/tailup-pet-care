@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowUpRight, Clock, Check } from "lucide-react";
-import { getServices } from "@/lib/catalog";
+import { getServiceBySlug } from "@/lib/catalog";
 import { ServiceIcon } from "@/components/icons";
 import { money } from "@/lib/utils";
 export const dynamic = "force-dynamic";
@@ -11,7 +11,7 @@ export default async function Page({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const service = (await getServices()).find((s) => s.slug === slug);
+  const service = await getServiceBySlug(slug);
   if (!service) notFound();
   return (
     <div className="container page-space">

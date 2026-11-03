@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { PackageCheck, Truck } from "lucide-react";
-import { getProducts } from "@/lib/catalog";
+import { getProductBySlug } from "@/lib/catalog";
 import { ProductArt } from "@/components/product-art";
 import { AddToCart } from "@/components/product-card";
 import { money } from "@/lib/utils";
@@ -15,7 +15,7 @@ export default async function Page({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = (await getProducts()).find((p) => p.slug === slug);
+  const product = await getProductBySlug(slug);
   if (!product) notFound();
   const reviews = previewMode
     ? []

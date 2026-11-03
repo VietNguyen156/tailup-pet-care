@@ -12,8 +12,8 @@ export async function StorefrontHome({ slug }: { slug: string }) {
   const { store, website } = await getStorefront(slug);
   const base = `/stores/${slug}`;
   const [services, products, gallery] = await Promise.all([
-    getServices(store.id),
-    getProducts(store.id),
+    getServices(store.id, 4),
+    getProducts(store.id, 4),
     getStoreGallery(store.id, slug),
   ]);
   return (

@@ -29,6 +29,7 @@ export function ServiceCard({
         <Link
           href={`/services/${service.slug}`}
           aria-label={`Chi tiết ${service.name}`}
+          prefetch={false}
         >
           <img
             src={service.imageUrl}
@@ -55,11 +56,12 @@ export function ServiceCard({
         <Link
           className="tenant-product-store"
           href={`/stores/${service.store.slug}`}
+          prefetch={false}
         >
           {service.store.name}
         </Link>
       )}
-      <Link href={`/services/${service.slug}`}>
+      <Link href={`/services/${service.slug}`} prefetch={false}>
         <h3>{service.name}</h3>
       </Link>
       <p>{service.description}</p>
@@ -74,6 +76,7 @@ export function ServiceCard({
           href={`/services/${service.slug}`}
           className="round-link"
           aria-label={`Chi tiết ${service.name}`}
+          prefetch={false}
         >
           <ArrowUpRight />
         </Link>

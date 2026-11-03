@@ -1,7 +1,7 @@
 import { catalogStoreId } from "@/lib/catalog-scope";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getServices, previewMode } from "@/lib/catalog";
+import { getServiceById, getServices, previewMode } from "@/lib/catalog";
 import { db } from "@/lib/db";
 import { currentUser } from "@/lib/auth";
 import { BookingForm } from "@/components/booking-form";
@@ -22,7 +22,7 @@ export default async function Page({
         orderBy: { name: "asc" },
       });
   const selectedService = query.service
-    ? (await getServices()).find((s) => s.id === query.service)
+    ? await getServiceById(query.service)
     : undefined;
   if (query.service && !selectedService) notFound();
   const store = query.store

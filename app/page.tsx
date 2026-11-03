@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 export default async function Page() {
   const [services, products] = await Promise.all([
     getServices(),
-    getProducts(),
+    getProducts(undefined, 4),
   ]);
   return <Home services={services} products={products} />;
 }

@@ -5,7 +5,7 @@ export function Footer() {
     <footer className="site-footer">
       <div className="container footer-top">
         <div>
-          <Link href="/" className="logo">
+          <Link href="/" className="logo" prefetch={false}>
             <PawPrint />
             TailUp.
           </Link>
@@ -17,19 +17,31 @@ export function Footer() {
         </div>
         <div>
           <h3>Khám phá TailUp</h3>
-          <Link href="/services">Dịch vụ chăm sóc</Link>
-          <Link href="/shop">Đồ dùng cho bé</Link>
-          <Link href="/journal">Góc chăm sóc</Link>
+          <Link href="/services" prefetch={false}>
+            Dịch vụ chăm sóc
+          </Link>
+          <Link href="/shop" prefetch={false}>
+            Đồ dùng cho bé
+          </Link>
+          <Link href="/journal" prefetch={false}>
+            Góc chăm sóc
+          </Link>
         </div>
         <div>
           <h3>Dành cho bạn</h3>
-          <Link href="/dashboard/pets">Hồ sơ thú cưng</Link>
-          <Link href="/dashboard/bookings">Lịch hẹn của tôi</Link>
-          <Link href="/dashboard/orders">Đơn hàng của tôi</Link>
+          <Link href="/dashboard/pets" prefetch={false}>
+            Hồ sơ thú cưng
+          </Link>
+          <Link href="/dashboard/bookings" prefetch={false}>
+            Lịch hẹn của tôi
+          </Link>
+          <Link href="/dashboard/orders" prefetch={false}>
+            Đơn hàng của tôi
+          </Link>
         </div>
         <div className="footer-note">
           <span className="eyebrow">MÌNH HẸN NHAU NHÉ?</span>
-          <Link href="/booking">
+          <Link href="/booking" prefetch={false}>
             Một buổi chăm sóc
             <br />
             cho người bạn nhỏ <ArrowUpRight />
