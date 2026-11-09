@@ -22,24 +22,25 @@
     "seed": "node --import tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
+    "@prisma/client": "6.19.0",
+    "@vercel/analytics": "^2.0.1",
+    "lucide-react": "^0.468.0",
     "next": "16.4.3",
     "react": "19.3.1",
     "react-dom": "19.3.1",
-    "@prisma/client": "6.19.0",
-    "zod": "^4.1.0",
     "react-hook-form": "^7.65.0",
-    "@hookform/resolvers": "^5.2.2",
-    "lucide-react": "^0.468.0"
+    "zod": "^4.1.0"
   },
   "devDependencies": {
-    "prisma": "6.19.0",
-    "typescript": "^5.9.0",
-    "tsx": "^4.20.0",
+    "@tailwindcss/postcss": "^4.1.0",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "prisma": "6.19.0",
     "tailwindcss": "^4.1.0",
-    "@tailwindcss/postcss": "^4.1.0"
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
   },
   "overrides": {
     "@prisma/config": {
