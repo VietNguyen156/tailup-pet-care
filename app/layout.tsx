@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { currentUser } from "@/lib/auth";
 import { CartProvider } from "@/components/cart-provider";
 import { Header } from "@/components/header";
@@ -41,6 +42,7 @@ export default async function RootLayout({
           </PlatformFooter>
           <BotpressChat />
         </CartProvider>
+        <Analytics />
       </body>
     </html>
   );

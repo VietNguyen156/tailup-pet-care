@@ -22,6 +22,7 @@
     "seed": "node --import tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "next": "16.4.3",
     "react": "19.3.1",
     "react-dom": "19.3.1",
